@@ -1,0 +1,88 @@
+.app-topbar {
+    position: relative;
+    z-index: 10;
+    display: flex;
+    height: 3.75rem;
+    flex: 0 0 3.75rem;
+    align-items: center;
+    gap: 1.25rem;
+    padding: 0 1.25rem;
+    border-bottom: 1px solid var(--color-border);
+    background: rgba(16, 17, 20, 0.86);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    backdrop-filter: blur(18px);
+}
+
+.window-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.45rem;
+}
+
+.window-control {
+    display: block;
+    width: 0.7rem;
+    height: 0.7rem;
+    border: 1px solid rgba(0, 0, 0, 0.2);
+    border-radius: 999px;
+}
+
+.window-control-close {
+    background: #ff6257;
+}
+
+.window-control-minimize {
+    background: #f5bd4f;
+}
+
+.window-control-expand {
+    background: #35c759;
+}
+
+.brand-lockup {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+}
+
+.brand-mark {
+    display: grid;
+    width: 1.9rem;
+    height: 1.9rem;
+    place-items: center;
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    border-radius: 0.6rem;
+    background: linear-gradient(145deg, #ff6845, var(--color-accent));
+    color: #fff;
+    font-size: 0.85rem;
+    font-weight: 750;
+    box-shadow: 0 5px 16px rgba(245, 73, 39, 0.2);
+}
+
+.brand-lockup h1 {
+    margin: 0;
+    color: var(--color-text);
+    font-size: 0.9rem;
+    font-weight: 650;
+    letter-spacing: -0.01em;
+}
+
+.brand-lockup p {
+    margin: 0.1rem 0 0;
+    color: var(--color-text-secondary);
+    font-size: 0.65rem;
+    letter-spacing: 0.02em;
+}
+
+@media (max-width: 640px) {
+    .app-topbar {
+        height: 3.25rem;
+        flex-basis: 3.25rem;
+        padding: 0 0.875rem;
+    }
+
+    .window-control {
+        width: 0.6rem;
+        height: 0.6rem;
+    }
+}

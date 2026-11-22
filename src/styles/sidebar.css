@@ -1,0 +1,113 @@
+.sidebar-shell {
+    flex: 0 0 17rem;
+    background: var(--color-sidebar);
+    border-color: var(--color-border);
+    box-shadow: 14px 0 40px rgba(0, 0, 0, 0.12);
+}
+
+.sidebar-shell > div {
+    padding: 1.25rem;
+}
+
+.new-chat-button {
+    background: var(--color-accent);
+    color: #fff;
+    box-shadow: 0 8px 22px rgba(245, 73, 39, 0.18);
+}
+
+.new-chat-button:hover {
+    background: #ff603d;
+    transform: translateY(-1px);
+}
+
+.sidebar-heading {
+    color: var(--color-text-secondary);
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+}
+
+.upload-button {
+    border-color: var(--color-border-strong);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--color-text-secondary);
+}
+
+.upload-button:hover:not(:disabled) {
+    border-color: rgba(245, 73, 39, 0.65);
+    background: var(--color-accent-soft);
+    color: var(--color-text);
+}
+
+.upload-button:disabled {
+    cursor: not-allowed;
+    background: rgba(255, 255, 255, 0.015);
+}
+
+.upload-button .animate-spin {
+    color: var(--color-accent);
+}
+
+.sidebar-empty-state {
+    border: 1px dashed var(--color-border);
+    border-radius: 0.75rem;
+    color: #70737d;
+    line-height: 1.5;
+    padding-top: 0.75rem;
+    padding-bottom: 0.75rem;
+}
+
+.conversation-row {
+    background: rgba(255, 255, 255, 0.025);
+    color: var(--color-text-secondary);
+}
+
+.conversation-row:hover,
+.conversation-row.is-active {
+    background: rgba(255, 255, 255, 0.07);
+    color: var(--color-text);
+}
+
+.conversation-row.is-active {
+    box-shadow: inset 2px 0 0 var(--color-accent);
+}
+
+.conversation-title {
+    color: inherit;
+}
+
+@media (max-width: 640px) {
+    .sidebar-shell {
+        flex-basis: 14rem;
+    }
+
+    .new-chat-button,
+    .upload-button {
+        font-size: 0.875rem;
+    }
+}
+
+@media (max-width: 480px) {
+    .sidebar-shell {
+        flex-basis: 11.5rem;
+    }
+
+    .sidebar-shell > div {
+        padding: 0.75rem;
+    }
+
+    .sidebar-heading {
+        font-size: 0.62rem;
+    }
+
+    .conversation-row {
+        padding: 0.65rem;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .upload-button .animate-spin {
+        animation: none;
+    }
+}
