@@ -287,13 +287,11 @@ async def upload_document(
             )
 
         # Save document metadata to SQLite.
-        document_id = save_document(
-            chat_id=chat_id,
-            filename=original_filename,
-            file_path=file_path,
-            file_type=extension,
-            chunk_count=chunks,
-        )
+       document_id = save_document(
+    chat_id=chat_id,
+    filename=original_filename,
+    file_path=file_path,
+)
 
         return {
             "success": True,
