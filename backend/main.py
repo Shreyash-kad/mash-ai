@@ -68,6 +68,7 @@ BASE_DIR = os.path.dirname(
 )
 
 DOCUMENT_FOLDER = os.path.join(BASE_DIR, "documents")
+
 os.makedirs(DOCUMENT_FOLDER, exist_ok=True)
 
 
@@ -115,8 +116,10 @@ def get_all_chats():
             "success": True,
             "chats": get_chats(),
         }
+
     except Exception as error:
         print("Get chats error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to load chats.",
@@ -127,12 +130,15 @@ def get_all_chats():
 def create_new_chat(request: CreateChatRequest):
     try:
         chat_id = create_chat(request.title)
+
         return {
             "success": True,
             "chat": get_chat(chat_id),
         }
+
     except Exception as error:
         print("Create chat error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to create chat.",
@@ -155,10 +161,13 @@ def get_chat_messages(chat_id: int):
             "chat": chat,
             "messages": get_messages(chat_id),
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Get messages error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to load messages.",
@@ -180,10 +189,13 @@ def pin_chat(chat_id: int):
             "success": True,
             "chat": get_chat(chat_id),
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Pin chat error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to update chat.",
@@ -205,10 +217,13 @@ def remove_chat(chat_id: int):
             "success": True,
             "message": "Chat deleted successfully.",
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Delete chat error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to delete chat.",
@@ -243,7 +258,10 @@ async def upload_document(
         )
 
     original_filename = os.path.basename(file.filename)
-    extension = os.path.splitext(original_filename)[1].lower()
+
+    extension = os.path.splitext(
+        original_filename
+    )[1].lower()
 
     if extension not in {".pdf", ".docx", ".txt"}:
         raise HTTPException(
@@ -251,8 +269,14 @@ async def upload_document(
             detail="Unsupported file type. Only PDF, DOCX and TXT files are supported.",
         )
 
-    safe_filename = f"{uuid.uuid4().hex}_{original_filename}"
-    file_path = os.path.join(DOCUMENT_FOLDER, safe_filename)
+    safe_filename = (
+        f"{uuid.uuid4().hex}_{original_filename}"
+    )
+
+    file_path = os.path.join(
+        DOCUMENT_FOLDER,
+        safe_filename,
+    )
 
     try:
         contents = await file.read()
@@ -287,11 +311,13 @@ async def upload_document(
             )
 
         # Save document metadata to SQLite.
-       document_id = save_document(
-    chat_id=chat_id,
-    filename=original_filename,
-    file_path=file_path,
-)
+        # Matches the existing db.py function signature.
+
+        document_id = save_document(
+            chat_id=chat_id,
+            filename=original_filename,
+            file_path=file_path,
+        )
 
         return {
             "success": True,
@@ -307,6 +333,7 @@ async def upload_document(
     except HTTPException:
         if os.path.exists(file_path):
             os.remove(file_path)
+
         raise
 
     except Exception as error:
@@ -317,7 +344,7 @@ async def upload_document(
 
         raise HTTPException(
             status_code=500,
-            detail="Failed to upload and index the document. Check the backend terminal for details.",
+            detail="Failed to upload and index the document. Check backend logs.",
         )
 
     finally:
@@ -342,10 +369,13 @@ def get_all_documents(chat_id: int | None = None):
             "chat_id": chat_id,
             "documents": get_documents(chat_id),
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Get documents error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to load documents.",
@@ -367,10 +397,13 @@ def get_one_document(document_id: int):
             "success": True,
             "document": document,
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Get document error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to load document.",
@@ -390,23 +423,29 @@ def remove_document(document_id: int):
 
         file_path = document.get("file_path")
 
-        # Delete the database record first, then the stored file.
         delete_document(document_id)
 
         if file_path and os.path.isfile(file_path):
             try:
                 os.remove(file_path)
+
             except OSError as error:
-                print("Could not remove physical document:", error)
+                print(
+                    "Could not remove physical document:",
+                    error,
+                )
 
         return {
             "success": True,
             "message": "Document deleted successfully.",
         }
+
     except HTTPException:
         raise
+
     except Exception as error:
         print("Delete document error:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to delete document.",
@@ -419,6 +458,7 @@ def remove_document(document_id: int):
 
 @app.post("/chat")
 def chat(request: ChatRequest):
+
     if not request.message.strip():
         raise HTTPException(
             status_code=400,
@@ -428,7 +468,9 @@ def chat(request: ChatRequest):
     chat_id = request.chat_id
 
     try:
-        # Create a chat automatically if no chat ID was provided.
+
+        # Create a new chat if no chat ID is provided.
+
         if chat_id is None:
             title = request.message.strip()
 
@@ -445,7 +487,12 @@ def chat(request: ChatRequest):
                 detail="Chat not found.",
             )
 
-        if chat_record["title"] == "New Chat" and not get_messages(chat_id):
+        # Automatically generate chat title.
+
+        if (
+            chat_record["title"] == "New Chat"
+            and not get_messages(chat_id)
+        ):
             title = request.message.strip()
 
             if len(title) > 40:
@@ -453,18 +500,26 @@ def chat(request: ChatRequest):
 
             update_chat_title(chat_id, title)
 
-        # Save the user's message.
-        save_message(chat_id, "user", request.message)
+        # Save user message.
 
-        # Load conversation history, excluding the latest user message
-        # because the current question is passed separately to Gemini.
+        save_message(
+            chat_id,
+            "user",
+            request.message,
+        )
+
+        # Load conversation history.
+
         messages = get_messages(chat_id)
+
         history = messages[:-1][-20:]
 
-        # Load saved long-term memory.
+        # Load long-term memory.
+
         memory = get_memories()
 
-        # Retrieve relevant document context for this chat.
+        # Retrieve RAG context.
+
         context = ""
         score = 0
         source = "Unknown"
@@ -476,19 +531,24 @@ def chat(request: ChatRequest):
             )
 
             if isinstance(result, tuple):
+
                 if len(result) >= 3:
                     context, score, source = result[:3]
+
                 elif len(result) == 2:
                     context, score = result
+
                 elif len(result) == 1:
                     context = result[0]
+
             elif isinstance(result, str):
                 context = result
 
         except Exception as rag_error:
             print("RAG search error:", rag_error)
 
-        # Generate the answer.
+        # Generate Gemini response.
+
         answer = ask_gemini(
             question=request.message,
             context=context,
@@ -496,8 +556,13 @@ def chat(request: ChatRequest):
             memory=memory,
         )
 
-        # Save the assistant's response.
-        save_message(chat_id, "assistant", answer)
+        # Save assistant response.
+
+        save_message(
+            chat_id,
+            "assistant",
+            answer,
+        )
 
         return {
             "success": True,
@@ -511,8 +576,10 @@ def chat(request: ChatRequest):
 
     except HTTPException:
         raise
+
     except Exception as error:
         print("CHAT ERROR:", error)
+
         raise HTTPException(
             status_code=500,
             detail="Failed to process chat message.",
